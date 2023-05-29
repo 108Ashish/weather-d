@@ -1,0 +1,70 @@
+<html>
+
+<head>
+	<title>Varanasi</title>
+
+<body>
+	<div style="display: flex; width: 100%; height: 100%; justify-content: center; align-items: center;">
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<input style="height: 36px; width: 250px; border: 2px solid blue; border-radius: 10px; box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;" id="searchBox" placeholder="Search City..." />
+			<label style="margin-top: 20px; color: crimson; cursor: pointer;" id="label"></label>
+			<h1 style="color: magenta;">Current -- Temperature</h1>
+			<h2 style="color: green;">--°C | --</h2>
+		</div>
+	</div>
+</body>
+<script>
+	let weatherReport;
+	const searchBox = document.querySelector('#searchBox')
+	searchBox.addEventListener('input', async (event) => {
+		const text = event.target.value;
+		const res = await getWeatherReport(text)
+		if (res) {
+			setSerachResultLabel(res['location']['name'])
+			weatherReport = res;
+		}
+	})
+
+	const label = document.querySelector('#label')
+	label.addEventListener('click', () => {
+		setSerachResultLabel('')
+		searchBox.value = ''
+		setReport(weatherReport)
+	})
+
+	const setSerachResultLabel = (city) => {
+		document.querySelector('label').innerHTML = city
+	}
+
+	const setReport = (result) => {
+		const temp = result['current']['temp_c'];
+		const dayType = result['current']['condition']['text']
+		document.querySelector('h1').innerHTML = `Current ${result['location']['name']} Temperature`
+		document.querySelector('h2').innerHTML = temp + '°C | ' + dayType
+	}
+
+	const getWeatherReport = async (val) => {
+		const url = `https://weatherapi-com.p.rapidapi.com/current.json?q=${val}`;
+		options = {
+			method: 'GET',
+			headers: {
+				'X-RapidAPI-Key': '40b70d1ad8msh260718d02e92b53p107048jsn82adcfc80d98',
+				'X-RapidAPI-Host': 'weatherapi-com.p.rapidapi.com'
+			}
+		};
+		try {
+			const response = await fetch(url, options);
+			const result = await response.json();
+			console.log(result)
+			if (result['message']) return ''
+			if (result) {
+				return result
+			}
+			return ''
+		} catch (error) {
+			console.error(error);
+		}
+	}
+</script>
+
+</html>
